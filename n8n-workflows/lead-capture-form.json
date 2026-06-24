@@ -1,0 +1,94 @@
+{
+  "name": "Lead Capture Form → Email + Airtable",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Contact Us",
+        "formDescription": "Leave your details and we'll get back to you shortly.",
+        "formFields": {
+          "values": [
+            { "fieldLabel": "Name", "requiredField": true },
+            { "fieldLabel": "Email", "fieldType": "email", "requiredField": true },
+            { "fieldLabel": "Message", "fieldType": "textarea", "requiredField": true }
+          ]
+        },
+        "options": {}
+      },
+      "id": "11111111-1111-4111-8111-111111111111",
+      "name": "Contact Form",
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.1,
+      "position": [240, 320],
+      "webhookId": "99999999-9999-4999-8999-999999999999"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            { "id": "a1", "name": "Name", "value": "={{ $json.Name }}", "type": "string" },
+            { "id": "a2", "name": "Email", "value": "={{ $json.Email }}", "type": "string" },
+            { "id": "a3", "name": "Message", "value": "={{ $json.Message }}", "type": "string" },
+            { "id": "a4", "name": "Submitted At", "value": "={{ $now.toISO() }}", "type": "string" }
+          ]
+        },
+        "options": {}
+      },
+      "id": "22222222-2222-4222-8222-222222222222",
+      "name": "Build Lead",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [460, 320]
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "operation": "send",
+        "sendTo": "ranahammad400000@gmail.com",
+        "subject": "=New lead: {{ $json.Name }}",
+        "message": "=You received a new lead from your website form:\n\nName: {{ $json.Name }}\nEmail: {{ $json.Email }}\n\nMessage:\n{{ $json.Message }}\n\nSubmitted: {{ $json['Submitted At'] }}\n\n— Sent automatically by n8n",
+        "options": {}
+      },
+      "id": "33333333-3333-4333-8333-333333333333",
+      "name": "Email Lead Alert",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [700, 200],
+      "credentials": {
+        "gmailOAuth2": { "id": "", "name": "Gmail account" }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "record",
+        "operation": "create",
+        "base": { "__rl": true, "value": "appqrG5Ln2A2HLPdv", "mode": "id" },
+        "table": { "__rl": true, "value": "Leads", "mode": "name" },
+        "columns": { "mappingMode": "autoMapInputData", "value": {}, "matchingColumns": [] },
+        "options": {}
+      },
+      "id": "44444444-4444-4444-8444-444444444444",
+      "name": "Log Lead to Airtable",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [700, 440],
+      "credentials": {
+        "airtableTokenApi": { "id": "", "name": "Airtable Personal Access Token" }
+      }
+    }
+  ],
+  "connections": {
+    "Contact Form": {
+      "main": [[{ "node": "Build Lead", "type": "main", "index": 0 }]]
+    },
+    "Build Lead": {
+      "main": [[
+        { "node": "Email Lead Alert", "type": "main", "index": 0 },
+        { "node": "Log Lead to Airtable", "type": "main", "index": 0 }
+      ]]
+    }
+  },
+  "active": false,
+  "settings": { "executionOrder": "v1" },
+  "pinData": {},
+  "meta": { "description": "Self-contained lead capture: hosted form -> normalize -> email alert + Airtable log." }
+}
