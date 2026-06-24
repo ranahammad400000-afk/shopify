@@ -1,0 +1,85 @@
+name: Uptime Monitor
+
+# Checks the services listed in uptime-monitor/sites.json on a schedule,
+# publishes a status page back to the repo, and opens/closes a GitHub issue
+# when something goes down or recovers. Uses only the built-in GITHUB_TOKEN.
+
+on:
+  schedule:
+    - cron: '*/30 * * * *'   # every 30 minutes
+  workflow_dispatch:
+  push:
+    branches: [claude/zen-galileo-tunqfk]
+    paths:
+      - 'uptime-monitor/src/**'
+      - 'uptime-monitor/sites.json'
+      - 'uptime-monitor/package.json'
+      - '.github/workflows/uptime.yml'
+
+permissions:
+  contents: write
+  issues: write
+
+concurrency:
+  group: uptime-monitor
+  cancel-in-progress: false
+
+jobs:
+  monitor:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Run health checks
+        working-directory: uptime-monitor
+        run: npm start
+
+      - name: Commit updated status
+        run: |
+          if [ -n "$(git status --porcelain uptime-monitor/status)" ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add uptime-monitor/status
+            git commit -m "chore(uptime): update status [skip ci]"
+            git push
+          else
+            echo "No status change."
+          fi
+
+      - name: File or resolve incident
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const summary = JSON.parse(fs.readFileSync('uptime-monitor/status/status.json', 'utf8'));
+            const down = summary.results.filter(r => !r.up);
+            const title = '🚨 Uptime incident: service(s) down';
+
+            const { data: open } = await github.rest.issues.listForRepo({
+              ...context.repo, state: 'open', labels: 'incident', per_page: 100,
+            });
+            const existing = open.find(i => i.title === title);
+
+            if (down.length) {
+              const body = [
+                `Detected **${down.length}** service(s) down at ${summary.checkedAt}:`, '',
+                ...down.map(r => `- **${r.name}** (${r.url}) — ${r.error || 'HTTP ' + r.status}`),
+              ].join('\n');
+              if (existing) {
+                await github.rest.issues.createComment({ ...context.repo, issue_number: existing.number, body });
+              } else {
+                try { await github.rest.issues.getLabel({ ...context.repo, name: 'incident' }); }
+                catch (e) { if (e.status === 404) await github.rest.issues.createLabel({ ...context.repo, name: 'incident', color: 'b60205' }); }
+                await github.rest.issues.create({ ...context.repo, title, body, labels: ['incident'] });
+              }
+            } else if (existing) {
+              await github.rest.issues.createComment({
+                ...context.repo, issue_number: existing.number,
+                body: `✅ All services recovered as of ${summary.checkedAt}. Closing incident.`,
+              });
+              await github.rest.issues.update({ ...context.repo, issue_number: existing.number, state: 'closed' });
+            }

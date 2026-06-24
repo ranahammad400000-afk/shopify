@@ -13,5 +13,12 @@ to tune it.
 | --- | --- | --- |
 | **Triage Bot** | New issue / PR | Labels issues by content, sizes PRs, welcomes first-time contributors |
 | **Stale Bot** | Daily schedule | Flags and closes issues/PRs that have gone quiet |
+| **Uptime Monitor** | Every 30 min | Checks your services, publishes a status page, files an incident issue on downtime |
 
 Both run on GitHub's built-in token — no secrets or paid services required.
+
+## Projects
+
+| Project | What it is |
+| --- | --- |
+| [`uptime-monitor/`](./uptime-monitor) | Zero-dependency uptime & health monitor that runs on GitHub Actions, publishes a live status page, and auto-files/closes incident issues. See its [README](./uptime-monitor/README.md). |
