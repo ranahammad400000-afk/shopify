@@ -1,0 +1,32 @@
+{
+  "checkedAt": "2026-06-24T21:31:09.898Z",
+  "total": 3,
+  "up": 3,
+  "down": 0,
+  "results": [
+    {
+      "name": "Shopify",
+      "url": "https://www.shopify.com",
+      "up": true,
+      "status": 200,
+      "latencyMs": 168,
+      "error": null
+    },
+    {
+      "name": "GitHub",
+      "url": "https://www.github.com",
+      "up": true,
+      "status": 200,
+      "latencyMs": 155,
+      "error": null
+    },
+    {
+      "name": "Example",
+      "url": "https://example.com",
+      "up": true,
+      "status": 200,
+      "latencyMs": 34,
+      "error": null
+    }
+  ]
+}
