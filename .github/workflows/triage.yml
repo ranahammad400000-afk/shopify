@@ -1,0 +1,128 @@
+name: Triage Bot
+
+# Automatically organizes incoming issues and pull requests so a team never
+# has to hand-sort them:
+#   - Issues  -> labeled by content (bug / enhancement / question / docs / urgent)
+#   - PRs     -> labeled by size (XS / S / M / L / XL)
+#   - First-time contributors get a friendly welcome comment
+#
+# Uses only the built-in GITHUB_TOKEN — no secrets or external services.
+
+on:
+  issues:
+    types: [opened, reopened, edited]
+  pull_request:
+    types: [opened, reopened, ready_for_review, synchronize]
+
+permissions:
+  issues: write
+  pull-requests: write
+  contents: read
+
+jobs:
+  triage-issue:
+    if: github.event_name == 'issues'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Label and welcome
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issue = context.payload.issue;
+            if (!issue) return;
+
+            const hay = `${issue.title || ''}\n${issue.body || ''}`.toLowerCase();
+            const rules = [
+              ['bug',           /\b(bug|error|broken|crash(es)?|fails?|failure|not working|doesn'?t work|exception|stack ?trace)\b/],
+              ['enhancement',   /\b(feature|enhancement|improve(ment)?|request|add support|nice to have|proposal)\b/],
+              ['question',      /\b(question|how (do|to|can)|help|why does|is it possible|support)\b/],
+              ['documentation', /\b(docs?|documentation|readme|typo|wording|example)\b/],
+              ['urgent',        /\b(urgent|asap|critical|production down|outage|p0|p1|blocker)\b/],
+            ];
+            const colors = {
+              'needs-triage':'ededed', bug:'d73a4a', enhancement:'a2eeef',
+              question:'d876e3', documentation:'0075ca', urgent:'b60205',
+            };
+
+            const toAdd = new Set(['needs-triage']);
+            for (const [label, re] of rules) if (re.test(hay)) toAdd.add(label);
+
+            // Make sure each label exists (create with a sensible color if not),
+            // then apply them all at once.
+            for (const name of toAdd) {
+              try {
+                await github.rest.issues.getLabel({ ...context.repo, name });
+              } catch (e) {
+                if (e.status === 404) {
+                  try { await github.rest.issues.createLabel({ ...context.repo, name, color: colors[name] || 'ededed' }); } catch (_) {}
+                }
+              }
+            }
+            await github.rest.issues.addLabels({
+              ...context.repo, issue_number: issue.number, labels: [...toAdd],
+            });
+
+            // Optional: assign the repo owner so nothing slips through the cracks.
+            try {
+              await github.rest.issues.addAssignees({
+                ...context.repo, issue_number: issue.number, assignees: [context.repo.owner],
+              });
+            } catch (_) {}
+
+            // Greet the reporter only when the issue is first opened/reopened.
+            if (['opened','reopened'].includes(context.payload.action)) {
+              const assoc = issue.author_association;
+              const firstTimer = ['FIRST_TIME_CONTRIBUTOR','FIRST_TIMER','NONE','MANNEQUIN'].includes(assoc);
+              const labelList = [...toAdd].map(l => '`' + l + '`').join(', ');
+              const body = firstTimer
+                ? `👋 Thanks for opening your first issue here, @${issue.user.login}! It's been auto-labeled (${labelList}) and flagged for triage. To help us help you faster, please make sure it includes steps to reproduce and what you expected to happen.`
+                : `Thanks @${issue.user.login} — auto-labeled (${labelList}) and queued for triage. A maintainer will follow up.`;
+              await github.rest.issues.createComment({ ...context.repo, issue_number: issue.number, body });
+            }
+
+  triage-pr:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Size and welcome
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+            if (!pr) return;
+
+            // Pull fresh numbers (the webhook payload can be slightly stale).
+            const { data: full } = await github.rest.pulls.get({ ...context.repo, pull_number: pr.number });
+            const changes = (full.additions || 0) + (full.deletions || 0);
+
+            const tiers = [['size/XS',0],['size/S',10],['size/M',100],['size/L',500],['size/XL',1000]];
+            const sizeColors = { 'size/XS':'3cbe00','size/S':'9bd100','size/M':'e0a800','size/L':'d9534f','size/XL':'b60205' };
+            let sizeLabel = 'size/XS';
+            for (const [name, floor] of tiers) if (changes >= floor) sizeLabel = name;
+
+            // Drop any stale size/* labels, keep only the current one.
+            for (const l of (full.labels || [])) {
+              if (l.name.startsWith('size/') && l.name !== sizeLabel) {
+                try { await github.rest.issues.removeLabel({ ...context.repo, issue_number: pr.number, name: l.name }); } catch (_) {}
+              }
+            }
+            try {
+              await github.rest.issues.getLabel({ ...context.repo, name: sizeLabel });
+            } catch (e) {
+              if (e.status === 404) {
+                try { await github.rest.issues.createLabel({ ...context.repo, name: sizeLabel, color: sizeColors[sizeLabel] }); } catch (_) {}
+              }
+            }
+            await github.rest.issues.addLabels({ ...context.repo, issue_number: pr.number, labels: [sizeLabel] });
+
+            // Welcome first-time contributors when the PR is first opened.
+            if (['opened','reopened','ready_for_review'].includes(context.payload.action)) {
+              const assoc = pr.author_association;
+              const firstTimer = ['FIRST_TIME_CONTRIBUTOR','FIRST_TIMER','NONE','MANNEQUIN'].includes(assoc);
+              if (firstTimer) {
+                await github.rest.issues.createComment({
+                  ...context.repo, issue_number: pr.number,
+                  body: `🎉 Thanks for your first contribution, @${pr.user.login}! This PR is **${sizeLabel.replace('size/','')}** (${changes} lines changed). A maintainer will review it shortly.`,
+                });
+              }
+            }
