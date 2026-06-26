@@ -1,0 +1,220 @@
+{
+  "name": "LinkedIn AI Engineer Scraper (Apify -> Airtable)",
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": [],
+  "pinData": {},
+  "meta": {},
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## LinkedIn -> AI Engineer Scraper (Apify node -> Airtable)\n\n**Requires the `@apify/n8n-nodes-apify` community node** installed:\nSettings -> Community Nodes -> Install -> `@apify/n8n-nodes-apify`\n\n**Setup:**\n1. **Apify credential** (`apifyApi`): paste your Apify API token; assign it to BOTH Apify nodes.\n2. **Apify - Run Actor:** set **Actor ID** to your LinkedIn scraper (from the actor's console URL). Paste the actor's **input JSON** (keep the `{{ $json.keywords }}` expressions or rename to the actor's own input fields).\n3. **Search Parameters:** edit keywords / location / maxResults.\n4. **Map Fields:** adjust the source keys to match your actor's output field names.\n5. **Airtable:** pick your Base + Table; create fields named exactly: Name, Contact Number, Website, Location, Email.\n\n**Heads-up:** public LinkedIn rarely exposes email / phone / website. Use an actor that returns or enriches contact data, or those columns will be blank. Respect LinkedIn's Terms and data-privacy law.",
+        "height": 540,
+        "width": 440,
+        "color": 5
+      },
+      "id": "note-aieng-air-0001",
+      "name": "Setup",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [-500, 40]
+    },
+    {
+      "parameters": {},
+      "id": "node-air-0001",
+      "name": "When clicking Test workflow",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [0, 300]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "sp1",
+              "name": "keywords",
+              "value": "AI Engineer",
+              "type": "string"
+            },
+            {
+              "id": "sp2",
+              "name": "location",
+              "value": "United States",
+              "type": "string"
+            },
+            {
+              "id": "sp3",
+              "name": "maxResults",
+              "value": 50,
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "node-air-0002",
+      "name": "Search Parameters",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [200, 300]
+    },
+    {
+      "parameters": {
+        "operation": "runActor",
+        "actorId": "YOUR_APIFY_ACTOR_ID",
+        "input": "={\n  \"queries\": [\"{{ $json.keywords }}\"],\n  \"locations\": [\"{{ $json.location }}\"],\n  \"maxItems\": {{ $json.maxResults }}\n}",
+        "waitForFinish": true
+      },
+      "id": "node-air-0003",
+      "name": "Apify - Run Actor",
+      "type": "@apify/n8n-nodes-apify.apify",
+      "typeVersion": 1,
+      "position": [400, 300]
+    },
+    {
+      "parameters": {
+        "operation": "getDatasetItems",
+        "datasetId": "={{ $json.defaultDatasetId }}"
+      },
+      "id": "node-air-0004",
+      "name": "Apify - Get Dataset Items",
+      "type": "@apify/n8n-nodes-apify.apify",
+      "typeVersion": 1,
+      "position": [620, 300]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "mp1",
+              "name": "Name",
+              "value": "={{ $json.fullName || $json.name || '' }}",
+              "type": "string"
+            },
+            {
+              "id": "mp2",
+              "name": "Contact Number",
+              "value": "={{ $json.phone || $json.phoneNumber || $json.mobileNumber || '' }}",
+              "type": "string"
+            },
+            {
+              "id": "mp3",
+              "name": "Website",
+              "value": "={{ $json.website || $json.companyWebsite || $json.publicProfileUrl || '' }}",
+              "type": "string"
+            },
+            {
+              "id": "mp4",
+              "name": "Location",
+              "value": "={{ $json.location || $json.addressWithCountry || $json.city || '' }}",
+              "type": "string"
+            },
+            {
+              "id": "mp5",
+              "name": "Email",
+              "value": "={{ $json.email || $json.emailAddress || '' }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "node-air-0005",
+      "name": "Map Fields",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [840, 300]
+    },
+    {
+      "parameters": {
+        "resource": "record",
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "YOUR_AIRTABLE_BASE_ID",
+          "mode": "list",
+          "cachedResultName": "AI Engineers"
+        },
+        "table": {
+          "__rl": true,
+          "value": "YOUR_AIRTABLE_TABLE_ID",
+          "mode": "list",
+          "cachedResultName": "AI Engineers"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [],
+          "schema": []
+        },
+        "options": {}
+      },
+      "id": "node-air-0006",
+      "name": "Airtable - Create Record",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [1060, 300]
+    }
+  ],
+  "connections": {
+    "When clicking Test workflow": {
+      "main": [
+        [
+          {
+            "node": "Search Parameters",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search Parameters": {
+      "main": [
+        [
+          {
+            "node": "Apify - Run Actor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Apify - Run Actor": {
+      "main": [
+        [
+          {
+            "node": "Apify - Get Dataset Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Apify - Get Dataset Items": {
+      "main": [
+        [
+          {
+            "node": "Map Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Map Fields": {
+      "main": [
+        [
+          {
+            "node": "Airtable - Create Record",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}
