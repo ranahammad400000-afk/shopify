@@ -32,8 +32,14 @@ export default function Showcase() {
             <motion.img
               key={product.id}
               className="showcase-shoe"
-              src={product.image}
+              src={product.photo || product.image}
               alt={product.name}
+              onError={(e) => {
+                if (!e.currentTarget.dataset.fb) {
+                  e.currentTarget.dataset.fb = '1'
+                  e.currentTarget.src = product.image
+                }
+              }}
               drag="x"
               dragConstraints={{ left: 0, right: 0 }}
               dragElastic={0.2}

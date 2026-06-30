@@ -104,8 +104,14 @@ export default function Hero() {
 
           <motion.img
             className="hero-shoe"
-            src={hero.image}
+            src={hero.photo || hero.image}
             alt={hero.name}
+            onError={(e) => {
+              if (!e.currentTarget.dataset.fb) {
+                e.currentTarget.dataset.fb = '1'
+                e.currentTarget.src = hero.image
+              }
+            }}
             style={{ y: shoeY, rotate: shoeRot }}
             initial={{ opacity: 0, scale: 0.6, x: 60 }}
             animate={{

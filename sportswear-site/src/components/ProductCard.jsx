@@ -1,5 +1,6 @@
 import { useRef } from 'react'
 import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion'
+import ShoeImage from './ShoeImage.jsx'
 
 const ease = [0.22, 1, 0.36, 1]
 
@@ -44,7 +45,7 @@ export default function ProductCard({ product, index }) {
 
       <div className="card-media">
         <div className="halo" style={{ background: product.glow }} />
-        <img src={product.image} alt={product.name} loading="lazy" />
+        <ShoeImage product={product} />
       </div>
 
       <div className="card-foot">

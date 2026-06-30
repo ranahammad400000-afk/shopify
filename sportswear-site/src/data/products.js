@@ -1,11 +1,14 @@
-// Product catalogue. Swap the `image` paths in /public/shoes for the real
-// product photography — filenames are kept stable so they drop straight in.
+// Product catalogue.
+// `photo` is your real product photograph (drop it into /public/shoes/photos —
+// see that folder's README). `image` is the stylised SVG fallback used until
+// the photo exists. The site shows `photo` automatically when present.
 export const products = [
   {
     id: 'ultra-black',
     name: 'ULTRA Trail',
     tagline: 'Stealth Black',
     price: 129,
+    photo: '/shoes/photos/shoe-black.jpg',
     image: '/shoes/shoe-black.svg',
     accent: '#9aa0a6',
     glow: 'rgba(154,160,166,0.35)',
@@ -17,6 +20,7 @@ export const products = [
     name: 'EMBER Trail',
     tagline: 'Crimson Fade',
     price: 139,
+    photo: '/shoes/photos/shoe-red.jpg',
     image: '/shoes/shoe-red.svg',
     accent: '#ff3b30',
     glow: 'rgba(255,59,48,0.4)',
@@ -28,6 +32,7 @@ export const products = [
     name: 'BLAZE Trail',
     tagline: 'Solar Orange',
     price: 139,
+    photo: '/shoes/photos/shoe-orange.jpg',
     image: '/shoes/shoe-orange.svg',
     accent: '#ff6a00',
     glow: 'rgba(255,106,0,0.4)',
@@ -39,6 +44,7 @@ export const products = [
     name: 'GLACIER Run',
     tagline: 'Sky Blue',
     price: 119,
+    photo: '/shoes/photos/shoe-blue.jpg',
     image: '/shoes/shoe-blue.svg',
     accent: '#5bc2ff',
     glow: 'rgba(91,194,255,0.4)',
@@ -50,6 +56,7 @@ export const products = [
     name: 'CARBON Air',
     tagline: 'Graphite Camo',
     price: 149,
+    photo: '/shoes/photos/shoe-camo.jpg',
     image: '/shoes/shoe-camo.svg',
     accent: '#ff7a18',
     glow: 'rgba(255,122,24,0.38)',
