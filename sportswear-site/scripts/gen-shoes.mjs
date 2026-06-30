@@ -1,6 +1,6 @@
-// Generates stylised trail-runner SVGs (one per colorway) into /public/shoes.
-// Replace these files with real product photography of the same name to
-// instantly skin the site with your own shoes.
+// Generates stylised side-profile trail-runner SVGs (one per colorway) into
+// /public/shoes. Replace these files with real product photography of the same
+// name to instantly reskin the site with your own shoes.
 import { writeFileSync, mkdirSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
@@ -10,85 +10,104 @@ const OUT = join(__dirname, '..', 'public', 'shoes')
 mkdirSync(OUT, { recursive: true })
 
 const ways = [
-  { file: 'shoe-black.svg',  upper1: '#23262b', upper2: '#0c0d10', accent: '#8b9096', sole: '#0a0a0c', lace: '#3a3d42' },
-  { file: 'shoe-red.svg',    upper1: '#ff3b30', upper2: '#1a0608', accent: '#ff6a5e', sole: '#0a0a0c', lace: '#111' },
-  { file: 'shoe-orange.svg', upper1: '#ff6a00', upper2: '#120a06', accent: '#ffae66', sole: '#0a0a0c', lace: '#111' },
-  { file: 'shoe-blue.svg',   upper1: '#bfe1ff', upper2: '#5b8fb5', accent: '#2c5d80', sole: '#0c0e12', lace: '#111' },
-  { file: 'shoe-camo.svg',   upper1: '#2a2d31', upper2: '#0b0c0e', accent: '#ff7a18', sole: '#0a0a0c', lace: '#2a2d31' },
+  // top = colour the upper fades FROM (top), bot = colour it fades TO (toe)
+  { file: 'shoe-black.svg',  top: '#26292e', bot: '#0b0c0f', accent: '#9aa0a6', sole: '#0a0a0c', mid: '#15171c', lace: '#3a3d42', solid: true },
+  { file: 'shoe-red.svg',    top: '#111114', bot: '#ff2d20', accent: '#ff6a5e', sole: '#0a0a0c', mid: '#141416', lace: '#0d0d0f' },
+  { file: 'shoe-orange.svg', top: '#121316', bot: '#ff6a00', accent: '#ffb273', sole: '#0a0a0c', mid: '#141416', lace: '#0d0d0f' },
+  { file: 'shoe-blue.svg',   top: '#5e90b6', bot: '#cfe7ff', accent: '#2c5d80', sole: '#0c0e12', mid: '#dfeefc', lace: '#0d0d0f' },
+  { file: 'shoe-camo.svg',   top: '#2b2e33', bot: '#0c0d10', accent: '#ff7a18', sole: '#0a0a0c', mid: '#15171c', lace: '#26282d', camo: true },
 ]
 
-// 16 sole lugs along the bottom
+// tread lugs hanging below the outsole
 function lugs(sole) {
   let p = ''
-  for (let i = 0; i < 17; i++) {
-    const x = 70 + i * 31
-    p += `<rect x="${x}" y="372" width="18" height="20" rx="4" fill="${sole}"/>`
+  for (let i = 0; i < 20; i++) {
+    const x = 78 + i * 22
+    const h = i % 2 === 0 ? 16 : 11
+    p += `<rect x="${x}" y="300" width="13" height="${h}" rx="3" fill="${sole}"/>`
   }
   return p
 }
 
-function shoe({ upper1, upper2, accent, sole, lace }, id) {
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 440" role="img" aria-label="trail running shoe">
+function shoe(w, id) {
+  const { top, bot, accent, sole, mid, lace, solid, camo } = w
+  const upperFill = solid ? `url(#up${id})` : `url(#up${id})`
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 380" role="img" aria-label="trail running shoe">
   <defs>
-    <linearGradient id="up${id}" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="${upper1}"/>
-      <stop offset="1" stop-color="${upper2}"/>
+    <linearGradient id="up${id}" x1="0.5" y1="0" x2="0.4" y2="1">
+      <stop offset="0" stop-color="${top}"/>
+      <stop offset="0.55" stop-color="${top}"/>
+      <stop offset="1" stop-color="${bot}"/>
     </linearGradient>
     <linearGradient id="mid${id}" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#2b2e33"/>
-      <stop offset="1" stop-color="#0c0d10"/>
+      <stop offset="0" stop-color="${mid}"/>
+      <stop offset="1" stop-color="${sole}"/>
     </linearGradient>
     <radialGradient id="sh${id}" cx="0.5" cy="0.5" r="0.5">
-      <stop offset="0" stop-color="rgba(0,0,0,0.55)"/>
+      <stop offset="0" stop-color="rgba(0,0,0,0.5)"/>
       <stop offset="1" stop-color="rgba(0,0,0,0)"/>
     </radialGradient>
+    <clipPath id="upclip${id}">
+      <path d="M62 250 C54 196 74 156 120 142 C150 133 250 130 320 132 C352 133 366 150 372 176 L384 150 C424 162 452 200 478 250 Z"/>
+    </clipPath>
   </defs>
 
-  <ellipse cx="320" cy="410" rx="250" ry="22" fill="url(#sh${id})"/>
+  <ellipse cx="300" cy="330" rx="250" ry="20" fill="url(#sh${id})"/>
 
   <!-- outsole -->
-  <path d="M58 360 Q60 330 110 326 L560 322 Q598 322 600 350 L600 372 Q600 392 575 392 L92 392 Q58 392 58 360 Z" fill="${sole}"/>
+  <path d="M52 250 C46 286 74 304 120 304 L500 304 C548 304 566 282 560 250 C540 256 360 262 300 262 C180 262 92 258 52 250 Z" fill="${sole}"/>
   ${lugs(sole)}
 
-  <!-- midsole -->
-  <path d="M60 350 Q70 300 150 296 L548 300 Q596 304 596 348 L596 360 Q470 372 300 370 Q150 368 60 360 Z" fill="url(#mid${id})"/>
-  <path d="M300 312 Q450 308 590 330" stroke="${accent}" stroke-width="6" fill="none" opacity="0.85"/>
+  <!-- midsole foam -->
+  <path d="M58 244 C52 214 86 196 150 194 L470 196 C540 198 566 220 560 250 C540 256 360 262 300 262 C180 262 92 258 58 244 Z" fill="url(#mid${id})"/>
+  <!-- midsole accent swoosh -->
+  <path d="M120 236 C260 214 430 214 552 240" stroke="${accent}" stroke-width="7" fill="none" opacity="0.9" stroke-linecap="round"/>
 
   <!-- upper body -->
-  <path d="M96 300 Q90 200 150 150 Q210 100 300 104 Q360 106 410 150 L470 250 Q540 260 560 300 Q470 318 300 316 Q170 314 96 300 Z" fill="url(#up${id})"/>
+  <path d="M62 250 C54 196 74 156 120 142 C150 133 250 130 320 132 C352 133 366 150 372 176 L384 150 C424 162 452 200 478 250 Z" fill="${upperFill}"/>
+
+  <!-- knit texture / wavy overlay on the upper, clipped to its shape -->
+  <g clip-path="url(#upclip${id})" opacity="${camo ? 0.5 : 0.28}">
+    ${Array.from({ length: 9 }, (_, i) => {
+      const y = 150 + i * 12
+      return `<path d="M70 ${y} C160 ${y - 10} 280 ${y - 10} 380 ${y}" stroke="${camo ? '#000' : accent}" stroke-width="${camo ? 6 : 2}" fill="none"/>`
+    }).join('')}
+  </g>
 
   <!-- toe cap -->
-  <path d="M96 300 Q90 250 120 220 Q160 210 200 230 L210 304 Q150 308 96 300 Z" fill="${upper2}" opacity="0.6"/>
+  <path d="M62 250 C56 214 66 184 92 168 C120 176 138 196 146 248 C118 252 84 252 62 250 Z" fill="${sole}" opacity="0.35"/>
 
   <!-- heel counter -->
-  <path d="M470 250 Q540 258 560 300 Q520 312 470 308 Z" fill="${upper2}" opacity="0.7"/>
+  <path d="M384 150 C424 162 452 200 478 250 C452 252 424 250 408 248 C400 210 390 178 384 150 Z" fill="#0d0e11" opacity="0.7"/>
 
-  <!-- accent dynamic stripe -->
-  <path d="M210 290 Q300 200 400 200 Q330 250 300 300 Z" fill="${accent}" opacity="0.5"/>
-  <path d="M250 300 L330 205 L360 205 L280 300 Z" fill="${accent}" opacity="0.7"/>
+  <!-- dynamic side cage (like the photos) -->
+  <path d="M150 248 L250 168 L286 168 L196 248 Z" fill="${accent}" opacity="0.55"/>
+  <path d="M210 248 L300 172 L320 178 L250 248 Z" fill="${accent}" opacity="0.8"/>
 
-  <!-- collar / ankle -->
-  <path d="M398 150 Q430 120 470 150 Q480 200 470 250 Q440 240 410 250 Q400 200 398 150 Z" fill="${upper2}"/>
-  <path d="M404 156 Q430 132 462 156 Q470 198 462 240 Q438 232 414 240 Q406 198 404 156 Z" fill="#0d0e11"/>
+  <!-- ankle collar -->
+  <path d="M312 150 C346 124 388 130 396 168 C400 196 392 224 378 246 C352 236 330 240 318 248 C312 214 310 180 312 150 Z" fill="#0e0f12"/>
+  <path d="M320 156 C348 136 380 142 386 170 C390 196 384 220 372 240 C350 232 332 236 322 244 C318 214 318 182 320 156 Z" fill="#08090b"/>
 
   <!-- tongue -->
-  <path d="M300 120 Q330 110 360 124 L356 180 Q330 172 304 180 Z" fill="${upper2}"/>
+  <path d="M232 150 C236 132 252 124 276 130 L300 138 L294 188 C268 178 248 178 230 186 Z" fill="${solid ? top : '#101012'}"/>
 
   <!-- laces -->
-  <g stroke="${lace}" stroke-width="9" stroke-linecap="round" fill="none">
-    <path d="M250 180 L330 156"/>
-    <path d="M256 210 L336 186"/>
-    <path d="M262 240 L342 216"/>
-    <path d="M268 270 L348 246"/>
+  <g stroke="${lace}" stroke-width="8" stroke-linecap="round" fill="none">
+    <path d="M196 196 L286 168"/>
+    <path d="M200 216 L292 188"/>
+    <path d="M206 236 L300 210"/>
   </g>
   <g fill="${accent}">
-    <circle cx="250" cy="180" r="5"/><circle cx="330" cy="156" r="5"/>
-    <circle cx="262" cy="240" r="5"/><circle cx="342" cy="216" r="5"/>
+    <circle cx="196" cy="196" r="4.5"/><circle cx="286" cy="168" r="4.5"/>
+    <circle cx="200" cy="216" r="4.5"/><circle cx="292" cy="188" r="4.5"/>
+    <circle cx="206" cy="236" r="4.5"/><circle cx="300" cy="210" r="4.5"/>
   </g>
 
-  <!-- brand pull tab -->
-  <rect x="466" y="120" width="40" height="22" rx="8" fill="${upper2}"/>
-  <text x="486" y="136" font-family="Archivo, sans-serif" font-size="11" font-weight="800" fill="${accent}" text-anchor="middle">S</text>
+  <!-- heel pull tab -->
+  <path d="M392 138 C404 128 420 132 420 146 C420 156 410 160 398 158 Z" fill="#0e0f12"/>
+
+  <!-- brand mark -->
+  <text x="300" y="282" font-family="Archivo, Arial, sans-serif" font-size="15" font-weight="800" fill="${accent}" text-anchor="middle" opacity="0.95">STRIDE</text>
 </svg>`
 }
 
@@ -97,7 +116,6 @@ ways.forEach((w, i) => {
   console.log('wrote', w.file)
 })
 
-// favicon
 const fav = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="#07080b"/><circle cx="32" cy="32" r="14" fill="#ff6a00"/></svg>`
 writeFileSync(join(__dirname, '..', 'public', 'favicon.svg'), fav)
 console.log('wrote favicon.svg')
