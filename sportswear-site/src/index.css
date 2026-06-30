@@ -137,6 +137,11 @@ button {
 .nav-links a:hover {
   color: var(--text);
 }
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
 .nav-cta {
   padding: 10px 20px;
   border-radius: 999px;
@@ -145,8 +150,47 @@ button {
   font-weight: 700;
   font-size: 0.9rem;
 }
+.nav-burger {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  width: 30px;
+  padding: 4px;
+}
+.nav-burger span {
+  display: block;
+  height: 2px;
+  width: 100%;
+  background: var(--text);
+  border-radius: 2px;
+}
+.mobile-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  overflow: hidden;
+  background: rgba(7, 8, 11, 0.96);
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--line);
+}
+.mobile-menu-inner {
+  display: flex;
+  flex-direction: column;
+  padding: 12px 24px 24px;
+}
+.mobile-menu-inner a {
+  font-family: 'Archivo', sans-serif;
+  font-weight: 800;
+  text-transform: uppercase;
+  font-size: 1.6rem;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--line);
+  color: var(--text);
+}
 @media (max-width: 760px) {
   .nav-links { display: none; }
+  .nav-burger { display: flex; }
 }
 
 /* ---------- Hero ---------- */
