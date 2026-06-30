@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="STRIDE — premium 3D joggers store full of motion, depth and effects." />
+  <title>STRIDE · 3D Joggers</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Syne:wght@600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <!-- Page-load intro -->
+  <div class="loader" id="loader" aria-hidden="true">
+    <div class="loader__bar"><span></span></div>
+    <div class="loader__word">STRIDE</div>
+  </div>
+
+  <!-- Animated background -->
+  <div class="bg-grad" aria-hidden="true"></div>
+  <div class="bg-noise" aria-hidden="true"></div>
+  <div class="cursor-glow" id="cursorGlow" aria-hidden="true"></div>
+
+  <!-- Navbar -->
+  <header class="nav" id="nav">
+    <a href="#top" class="nav__logo" data-magnetic>STRIDE<span>°</span></a>
+    <nav class="nav__links">
+      <a href="#shop">Shop</a>
+      <a href="#story">Story</a>
+      <a href="#lookbook">Lookbook</a>
+      <a href="#reviews">Reviews</a>
+    </nav>
+    <button class="nav__cart" data-magnetic aria-label="Open cart">
+      <span class="nav__cart-icon">🛒</span>
+      <span class="nav__cart-count" id="cartCount">0</span>
+    </button>
+  </header>
+
+  <!-- HERO -->
+  <section class="hero" id="top">
+    <canvas id="hero3d" class="hero__canvas" aria-hidden="true"></canvas>
+    <div class="hero__layer hero__layer--back" data-parallax="0.15"></div>
+    <div class="hero__inner">
+      <p class="hero__eyebrow" data-reveal>New Drop · SS26</p>
+      <h1 class="hero__title">
+        <span class="word" data-word>Move</span>
+        <span class="word" data-word>in</span>
+        <span class="word hero__title--accent" data-word>3D.</span>
+      </h1>
+      <p class="hero__sub" data-reveal>Engineered joggers built for motion. Weightless fabric, sculpted fit, infinite stride.</p>
+      <div class="hero__cta" data-reveal>
+        <a href="#shop" class="btn btn--glow" data-magnetic>Shop the drop</a>
+        <a href="#story" class="btn btn--ghost" data-magnetic>The story</a>
+      </div>
+    </div>
+    <div class="hero__scroll" aria-hidden="true"><span></span>scroll</div>
+  </section>
+
+  <!-- MARQUEE -->
+  <div class="marquee" aria-hidden="true">
+    <div class="marquee__track">
+      <span>WEIGHTLESS&nbsp;·&nbsp;</span><span>4-WAY STRETCH&nbsp;·&nbsp;</span><span>SCULPTED FIT&nbsp;·&nbsp;</span>
+      <span>FREE SHIPPING&nbsp;·&nbsp;</span><span>WEIGHTLESS&nbsp;·&nbsp;</span><span>4-WAY STRETCH&nbsp;·&nbsp;</span>
+      <span>SCULPTED FIT&nbsp;·&nbsp;</span><span>FREE SHIPPING&nbsp;·&nbsp;</span>
+    </div>
+  </div>
+
+  <!-- SHOP / PRODUCT GRID -->
+  <section class="shop" id="shop">
+    <div class="section-head">
+      <h2 class="section-title" data-reveal>The Collection</h2>
+      <p class="section-desc" data-reveal>Tilt them. Hover them. Every pair re-shuffles on each visit.</p>
+    </div>
+    <div class="grid" id="productGrid"><!-- cards injected by JS --></div>
+  </section>
+
+  <!-- SCROLL STORY -->
+  <section class="story" id="story">
+    <div class="story__pin">
+      <div class="story__media">
+        <div class="story__img" data-story-img></div>
+        <div class="story__img" data-story-img></div>
+        <div class="story__img" data-story-img></div>
+      </div>
+      <div class="story__text">
+        <span class="story__index">01 — Fabric</span>
+        <h3>Spun for speed.</h3>
+        <p>A four-way stretch knit that disappears the moment you put it on. Breathable, featherlight, relentless.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- LOOKBOOK / GALLERY -->
+  <section class="lookbook" id="lookbook">
+    <div class="section-head">
+      <h2 class="section-title" data-reveal>Lookbook</h2>
+      <p class="section-desc" data-reveal>Scattered on purpose.</p>
+    </div>
+    <div class="collage" id="collage"><!-- images injected by JS --></div>
+  </section>
+
+  <!-- REVIEWS -->
+  <section class="reviews" id="reviews">
+    <div class="section-head">
+      <h2 class="section-title" data-reveal>Worn &amp; loved</h2>
+    </div>
+    <div class="reviews__viewport">
+      <div class="reviews__track" id="reviewTrack"></div>
+    </div>
+    <div class="reviews__dots" id="reviewDots"></div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer" id="footer">
+    <div class="footer__cta" data-reveal>
+      <h2>Join the stride.</h2>
+      <form class="footer__form" id="newsForm">
+        <input type="email" required placeholder="you@email.com" aria-label="Email" />
+        <button type="submit" data-magnetic>Subscribe</button>
+      </form>
+      <p class="footer__msg" id="newsMsg" role="status"></p>
+    </div>
+    <div class="footer__bottom">
+      <span>STRIDE°</span>
+      <div class="footer__social">
+        <a href="#" data-magnetic>Instagram</a>
+        <a href="#" data-magnetic>TikTok</a>
+        <a href="#" data-magnetic>X</a>
+      </div>
+      <span>© 2026 — Built with motion.</span>
+    </div>
+  </footer>
+
+  <!-- Libraries (CDN) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <script src="https://unpkg.com/@studio-freight/lenis@1.0.42/dist/lenis.min.js"></script>
+  <script type="importmap">
+    { "imports": { "three": "https://unpkg.com/three@0.160.0/build/three.module.js" } }
+  </script>
+  <script type="module" src="js/hero3d.js"></script>
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
