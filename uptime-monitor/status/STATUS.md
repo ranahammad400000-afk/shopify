@@ -1,11 +1,11 @@
 # Service Status
 
-_Last checked: 2026-08-15T21:10:25.942Z_
+_Last checked: 2026-08-15T21:41:29.198Z_
 
 **3/3 up** · ✅ all systems operational
 
 | Service | Status | Code | Latency |
 | --- | --- | --- | --- |
-| [Shopify](https://www.shopify.com) | 🟢 up | 200 | 124 ms |
-| [GitHub](https://www.github.com) | 🟢 up | 200 | 43 ms |
-| [Example](https://example.com) | 🟢 up | 200 | 25 ms |
+| [Shopify](https://www.shopify.com) | 🟢 up | 200 | 156 ms |
+| [GitHub](https://www.github.com) | 🟢 up | 200 | 57 ms |
+| [Example](https://example.com) | 🟢 up | 200 | 123 ms |
