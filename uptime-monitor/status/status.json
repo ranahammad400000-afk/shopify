@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-08-17T16:13:26.621Z",
+  "checkedAt": "2026-08-17T16:51:29.784Z",
   "total": 3,
   "up": 3,
   "down": 0,
@@ -9,7 +9,7 @@
       "url": "https://www.shopify.com",
       "up": true,
       "status": 200,
-      "latencyMs": 165,
+      "latencyMs": 148,
       "error": null
     },
     {
@@ -17,7 +17,7 @@
       "url": "https://www.github.com",
       "up": true,
       "status": 200,
-      "latencyMs": 38,
+      "latencyMs": 58,
       "error": null
     },
     {
@@ -25,7 +25,7 @@
       "url": "https://example.com",
       "up": true,
       "status": 200,
-      "latencyMs": 23,
+      "latencyMs": 41,
       "error": null
     }
   ]
