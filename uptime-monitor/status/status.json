@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-08-17T07:42:01.699Z",
+  "checkedAt": "2026-08-17T08:29:42.130Z",
   "total": 3,
   "up": 3,
   "down": 0,
@@ -17,7 +17,7 @@
       "url": "https://www.github.com",
       "up": true,
       "status": 200,
-      "latencyMs": 39,
+      "latencyMs": 232,
       "error": null
     },
     {
@@ -25,7 +25,7 @@
       "url": "https://example.com",
       "up": true,
       "status": 200,
-      "latencyMs": 27,
+      "latencyMs": 50,
       "error": null
     }
   ]
