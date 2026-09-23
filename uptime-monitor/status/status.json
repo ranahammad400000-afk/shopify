@@ -1,31 +1,31 @@
 {
-  "checkedAt": "2026-09-23T20:32:53.861Z",
+  "checkedAt": "2026-09-23T23:16:59.155Z",
   "total": 3,
-  "up": 2,
-  "down": 1,
+  "up": 3,
+  "down": 0,
   "results": [
     {
       "name": "Shopify",
       "url": "https://www.shopify.com",
       "up": true,
       "status": 200,
-      "latencyMs": 287,
+      "latencyMs": 176,
       "error": null
     },
     {
       "name": "GitHub",
       "url": "https://www.github.com",
-      "up": false,
-      "status": 0,
-      "latencyMs": 318,
-      "error": "fetch failed"
+      "up": true,
+      "status": 200,
+      "latencyMs": 352,
+      "error": null
     },
     {
       "name": "Example",
       "url": "https://example.com",
       "up": true,
       "status": 200,
-      "latencyMs": 146,
+      "latencyMs": 53,
       "error": null
     }
   ]
